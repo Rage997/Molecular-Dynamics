@@ -4,15 +4,9 @@ import random
 import time
 import math
 import matplotlib.pyplot as plt
-from scipy.spatial import KDTree
-
-from utils import LJForce, VelocityVerletTimeStepping
 
 random.seed(time.time())
-
-#create a box of particles
-#make object Box which will hold all the particles
-class Box:
+class MolecularDynamics:
     def __init__(self, numberOfParticles, boxLength, dimension, sigma, epsilon,
                 rc, temperature, dt):
         self.numberOfParticles = numberOfParticles
@@ -22,13 +16,14 @@ class Box:
         self.epsilon = epsilon
         self.rc = rc
         self.temperature = temperature
-        self.dt = dt #time step
-        
+        self.dt = dt #time step 
         self.nrho = numberOfParticles/(boxLength**(dimension)) # particles density
 
+        # Init particles positions and velocities
         self.particlePositions = np.zeros((numberOfParticles, dimension))
-        self.particleVelocities = self.boxLength*(np.random.rand(numberOfParticles, dimension)-0.5) #assign randomly
+        self.particleVelocities = (np.random.rand(numberOfParticles, dimension)-0.5) #assign randomly
         self.particleForces = np.zeros((numberOfParticles, dimension))
+        self.latticePositions()
 
     def latticePositions(self):
         '''Assigns particles randomly in a regular lattice'''
@@ -44,8 +39,13 @@ class Box:
             count += 1
             if count>self.numberOfParticles-1:
                 break
-        return self
-
+        # Scale factor of velocities
+        sumv2 = np.mean(self.particleVelocities**2, axis=0)
+        fs = np.sqrt(3*self.temperature/sumv2)
+        # Ensure that momentum is zero
+        v_cm = np.mean(self.particleVelocities, axis=0)
+        self.particleVelocities = fs*(self.particleVelocities - v_cm)
+        
     def evaluateKineticEnergy(self):
         return 0.5*np.sum(np.square(self.particleVelocities))
 
@@ -76,20 +76,25 @@ class Box:
             for j in range(i+1, self.numberOfParticles):
                 rij = self.particlePositions[i,:]-self.particlePositions[j,:]
                 for k in range(self.dimension):
-                    # this ensures the periodicity of the box
+                    # periodicity of the box
                     if abs(rij[k])>self.boxLength/2:
                         rij[k] -= self.boxLength*np.sign(rij[k])
-                rji = -rij
-                self.particleForces[i,:] += LJForce(rij)
+                # rji = -rij
+                self.particleForces[i,:] += self.LJForce(rij)
                 self.particleForces[j,:] += -self.particleForces[i,:]
-        return self
 
-    # todo this can be put in init
-    def stationaryCenterOfMass(self):
-        '''Ensures that total momentum is zero'''
-        v_cm = np.mean(self.particleVelocities, axis=0)
-        self.particleVelocities = self.particleVelocities - v_cm
-        return self
+    def LJForce(self, xr):
+        r = np.linalg.norm(xr, 2)
+        if r > self.rc:
+            force = 0
+        else:
+            force = 48/(r**2)*(1/(r**12)-0.5*1/(r**6))*xr
+        return force
+
+    def IntegrateVerlet(self):
+        '''Integrate in space using Verlet scheme'''
+        
+        self.particlePositions = self.particlePositions + self.particleVelocities*self.dt + 0.5*self.particleForces*(self.dt)**2
 
     def evaluateTotalMomentum(self):
         # the mass is 1 for each particle
@@ -109,21 +114,4 @@ class Box:
         plt.xlabel("x")
         plt.ylabel("y")
         plt.plot(self.particlePositions[:, 0], self.particlePositions[:, 1], '.r')
-
         plt.savefig(filename)
-
-
-
-#   self.initVerletList()
-        
-#     def initVerletList(self):
-#         size = int(np.ceil(self.boxLength/self.rc))
-#         self.verletList =  np.empty( (size,size), dtype=object)
-#         for i in range(self.numberOfParticles):
-#             pos = self.particlePositions[i,:]
-#             idx = np.ceil(pos)
-#             ii, jj = int(idx[0]), int(idx[1])
-#             if self.verletList[ii, jj]:
-#                 self.verletList[ii, jj].append(i)
-#             else:
-#                 self.verletList[ii, jj] = [i]
