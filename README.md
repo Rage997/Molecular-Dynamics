@@ -1,7 +1,11 @@
 # Molecular-Dynamics
 
 A Molecular Dynamcis simulation using Lennard-Jones potential.
-Verlet list has been implemented to have efficient short range molecular interactions. All the code relies on numpy.
-# How to run
-The parameters for the simulation can be setted in settings.py. The code can be executed by '''python3 main.py'''
 
+# TODOs
+1. Verlet list to have efficient short range molecular interactions
+2. Radial distribution function
+
+
+# Known bugs
+When the particles get "too close" to each other, the system "explodes". I've been working on it for an embarrassing number of hours but didn't manage to solve it. The code in the current state is therefore incomplete. 
