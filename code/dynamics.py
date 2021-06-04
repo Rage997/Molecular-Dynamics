@@ -30,7 +30,7 @@ class MolecularDynamics:
 
         pointsInLattice = math.ceil(self.numberOfParticles**(1/self.dimension))
 
-        spots = np.linspace(0, self.boxLength, num=pointsInLattice, endpoint=False)
+        spots = np.linspace(0, self.boxLength-1, num=pointsInLattice, endpoint=True)
         count = 0
         for p in itertools.product(spots, repeat=self.dimension):
             # we "insert" each line sequentially into the regular lattice
@@ -95,6 +95,8 @@ class MolecularDynamics:
         '''Integrate in space using Verlet scheme'''
         
         self.particlePositions = self.particlePositions + self.particleVelocities*self.dt + 0.5*self.particleForces*(self.dt)**2
+        # periodicity
+        self.particlePositions = np.mod(self.particlePositions, [self.boxLength, self.boxLength])
 
     def evaluateTotalMomentum(self):
         # the mass is 1 for each particle
@@ -110,8 +112,11 @@ class MolecularDynamics:
 
     def plot(self, filename):
         '''For 2D, I suggest to use the good and old matplotlib'''
+        plt.figure()
         plt.title("System at timestep ...")
         plt.xlabel("x")
         plt.ylabel("y")
+        plt.xlim([-0.1*self.boxLength, 1.05*self.boxLength])
+        plt.ylim([-0.1*self.boxLength, 1.05*self.boxLength])
         plt.plot(self.particlePositions[:, 0], self.particlePositions[:, 1], '.r')
         plt.savefig(filename)

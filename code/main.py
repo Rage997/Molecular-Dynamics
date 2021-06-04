@@ -12,10 +12,10 @@ sigma = 1
 epsilon = 1
 rc = 2.5
 
-temperature = 1
+temperature = 0.5
 L = 30
 dt = 0.0001 #time step
-T_max = 1000
+T_max = 8000
 
 #set up the simulation
 simulation = dynamics.MolecularDynamics(numberOfParticles, L, dimension, 
@@ -36,7 +36,9 @@ momentum[0] = simulation.evaluateTotalMomentum()
 
 
 for i in range(T_max):
-    # simulation.plot('system{}.png'.format(i))
+    if i % 1000 == 0:
+       print('timestep:', i)
+       simulation.plot('system{}.png'.format(i))
 
     #do the time step, knowing that simulation already knows the particle forces at the moment
     simulation.IntegrateVerlet() #evaluates forces on particles, updates particle positions and velocities
