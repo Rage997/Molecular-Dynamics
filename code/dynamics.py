@@ -29,8 +29,7 @@ class MolecularDynamics:
         '''Assigns particles randomly in a regular lattice'''
 
         pointsInLattice = math.ceil(self.numberOfParticles**(1/self.dimension))
-
-        spots = np.linspace(0, self.boxLength-1, num=pointsInLattice, endpoint=True)
+        spots = np.linspace(1, self.boxLength, num=pointsInLattice, endpoint=False)
         count = 0
         for p in itertools.product(spots, repeat=self.dimension):
             # we "insert" each line sequentially into the regular lattice
