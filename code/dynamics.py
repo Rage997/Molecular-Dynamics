@@ -23,7 +23,7 @@ class MolecularDynamics:
         self.particlePositions = np.zeros((numberOfParticles, dimension))
         self.particleVelocities = (np.random.rand(numberOfParticles, dimension)-0.5) #assign randomly
         self.particleForces = np.zeros((numberOfParticles, dimension))
-        self.energy = 0
+        self.potential_energy = 0
         self.latticePositions()
 
     def latticePositions(self):
@@ -46,15 +46,17 @@ class MolecularDynamics:
         v_cm = np.mean(self.particleVelocities, axis=0)
         self.particleVelocities = fs*(self.particleVelocities - v_cm)
 
+    def evaluateKineticEnergy(self):
+        return 0.5*np.sum(np.square(self.particleVelocities))
+
+    def evaluatePotentialEnergy(self):
+        return self.potential_energy
+
     def evaluateTotalEnergy(self):
-        # Kinetic energy is not required apparently
-        # K = 0.5*np.sum(np.square(self.particleVelocities)) 
-        # return self.PotentialEnergy + K
-        return self.energy
+        return self.evaluateKineticEnergy() + self.evaluatePotentialEnergy()
 
     def evaluateForce(self):
         #force = - gradient of potential
-        
         self.particleForces = np.zeros((self.numberOfParticles, self.dimension))
         for i in range(self.numberOfParticles-1):
             for j in range(i+1, self.numberOfParticles):
@@ -71,7 +73,7 @@ class MolecularDynamics:
         else:
             force = 48/(r**2)*(1/(r**12)-0.5*1/(r**6))*xr - ecut
         # Update energy
-        self.energy += 4*(1/r**6)*(1/r**6 - 1) - ecut
+        self.potential_energy += 4*(1/r**6)*(1/r**6 - 1) - ecut
         return force
 
     def IntegrateVerlet(self):
