@@ -3,8 +3,8 @@
 A Molecular Dynamcis simulation using Lennard-Jones potential.
 
 # TODOs
-[-]Verlet list to have efficient short range molecular interactions
-[] Radial distribution function
+- [x]Verlet list to have efficient short range molecular interactions
+- [ ] Radial distribution function
 
 
 # Known bugs
