@@ -132,8 +132,8 @@ class MolecularDynamics:
         ene_pot_tot = np.sum(self.ene_pot)
         ene_tot = ene_kin_tot + ene_pot_tot
 
-        print('kinetic energy: potential energy: total energy')
-        print(ene_kin_tot, ene_pot_tot,  ene_tot)
+        # print('kinetic energy: potential energy: total energy')
+        # print(ene_kin_tot, ene_pot_tot,  ene_tot)
         return ene_tot
         
     def output(self, filename):

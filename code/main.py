@@ -5,7 +5,7 @@ import numpy as np
 import math
 
 # Parameters of simulation
-numberOfParticles = 500
+numberOfParticles = 100
 dimension = 2 # this should work also in 3D but haven't tested much. Future work
 # Truncated lennard-jones potential params
 sigma = 1
@@ -13,7 +13,7 @@ epsilon = 1
 rc = 2.5
 temperature = 0.1
 L = 30
-dt = 1e-6 #time step
+dt = 1e-4 #time step
 T_max = 1
 
 #set up the simulation
